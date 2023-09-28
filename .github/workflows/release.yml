@@ -12,32 +12,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - run: echo "${{ secrets.DHTOKEN }}" | docker login -u kylepenfound --password-stdin
       - run: cd /usr/local/bin && { sudo curl -L https://github.com/kpenfound/zenith-releaser/releases/download/nightly/dagger-zenith-linux-amd64 -o dagger; sudo chmod +x dagger; cd -; }
       # Fail if this binary doesn't work
       - run: dagger version
         shell: bash
       - run: |
-          dagger query -m ./dagger --doc ./graphql/publish-zenith.gql
+          dagger query -m ./dagger --doc ./graphql/publish-zenith.gql && \
+          dagger query -m ./dagger --doc ./graphql/publish-zenith-linux-arm64.gql && \
+          dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-amd64.gql && \
+          dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-arm64.gql && \
         shell: bash
-      - run: docker logs $(docker ps -aq)
-        if: always()
         env:
-           _EXPERIMENTAL_DAGGER_CLI_BIN: "/usr/local/bin/dagger"
-#          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 #
 #      # Fail if this built binary doesn't work
-#      - run: ./dist/dagger-zenith-linux-amd64 version
-#        shell: bash
-#
-#      - run: |
-#          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-arm64
-#        env:
-#          GH_TOKEN: ${{ secrets.GHTOKEN }}
-#          gh release delete nightly --yes
-#          gh release create nightly --prerelease --notes-from-tag
-#          gh release upload --clobber nightly ./dist/dagger-zenith-linux-amd64
-#          gh release upload --clobber nightly ./dist/dagger-zenith-linux-arm64
-#          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-amd64
+     - run: ./dist/dagger-zenith-linux-amd64 version
+       shell: bash
+
+     - run: |
+         gh release upload --clobber nightly ./dist/dagger-zenith-darwin-arm64 && \
+         gh release upload --clobber nightly ./dist/dagger-zenith-linux-amd64 && \
+         gh release upload --clobber nightly ./dist/dagger-zenith-linux-arm64 && \
+         gh release upload --clobber nightly ./dist/dagger-zenith-darwin-amd64
+       env:
+         GH_TOKEN: ${{ secrets.GHTOKEN }}
 
