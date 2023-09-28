@@ -1,0 +1,44 @@
+name: Nightly Zenith build
+
+on:
+  #schedule:
+  #  - cron: '*/30 * * * *' # every 30 minutes
+  workflow_dispatch: # on button click
+
+jobs:
+  nightly:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: echo "${{ secrets.DHTOKEN }}" | docker login -u kylepenfound --password-stdin
+      - run: cd /usr/local/bin && { sudo curl -L https://github.com/jpadams/shykes-dagger-zenith-builder/releases/download/nightly/dagger-zenith-linux-amd64 -o dagger; sudo chmod +x dagger; cd -; }
+      # Fail if this binary doesn't work
+      - run: dagger version
+        shell: bash
+
+      - run: |
+          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-darwin-arm64.gql
+        shell: bash
+#        env:
+#          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+#          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-linux-amd64.gql
+#          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-linux-arm64.gql
+#          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-darwin-amd64.gql
+#
+#      # Fail if this built binary doesn't work
+#      - run: ./dist/dagger-zenith-linux-amd64 version
+#        shell: bash
+#
+#      - run: |
+#          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-arm64
+#        env:
+#          GH_TOKEN: ${{ secrets.GHTOKEN }}
+#          gh release delete nightly --yes
+#          gh release create nightly --prerelease --notes-from-tag
+#          gh release upload --clobber nightly ./dist/dagger-zenith-linux-amd64
+#          gh release upload --clobber nightly ./dist/dagger-zenith-linux-arm64
+#          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-amd64
+
