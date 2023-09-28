@@ -19,7 +19,7 @@ jobs:
       - run: dagger version
         shell: bash
       - run: |
-          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith.gql
+          dagger query -m ./dagger --doc ./graphql/publish-zenith.gql
         shell: bash
       - run: docker logs $(docker ps -aq)
         if: always()
