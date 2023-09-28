@@ -18,8 +18,8 @@ jobs:
           dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-arm64.gql
         env:
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
-     - run: ./dist/dagger-zenith-linux-amd64 version
-     - run: |
+      - run: ./dist/dagger-zenith-linux-amd64 version
+      - run: |
          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-arm64
          gh release upload --clobber nightly ./dist/dagger-zenith-linux-amd64
          gh release upload --clobber nightly ./dist/dagger-zenith-linux-arm64
