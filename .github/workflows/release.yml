@@ -12,10 +12,10 @@ jobs:
       - run: cd /usr/local/bin && { sudo curl -L https://github.com/kpenfound/zenith-releaser/releases/download/nightly/dagger-zenith-linux-amd64 -o dagger; sudo chmod +x dagger; cd -; }
       - run: dagger version
       - run: |
-          dagger query -m ./dagger --doc ./graphql/publish-zenith.gql
-          dagger query -m ./dagger --doc ./graphql/publish-zenith-linux-arm64.gql
-          dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-amd64.gql
-          dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-arm64.gql
+          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith.gql
+          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-linux-arm64.gql
+          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-darwin-amd64.gql
+          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-darwin-arm64.gql
         env:
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
       - run: ./dist/dagger-zenith-linux-amd64 version
