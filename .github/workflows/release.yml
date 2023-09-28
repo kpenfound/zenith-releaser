@@ -18,11 +18,19 @@ jobs:
       # Fail if this binary doesn't work
       - run: dagger version
         shell: bash
-
+      - run: |
+          docker run \
+            --name dagger-engine.dev \
+            --privileged \
+            --stop-signal SIGTERM \
+            -d \
+            -v dagger-engine:/var/lib/dagger \
+            kylepenfound/dagger-engine-worker-zenith:main
       - run: |
           dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-darwin-arm64.gql
         shell: bash
-#        env:
+        env:
+           _EXPERIMENTAL_DAGGER_RUNNER_HOST: docker-container://dagger-engine.dev
 #          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 #          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-linux-amd64.gql
 #          dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-linux-arm64.gql
