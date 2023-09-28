@@ -21,7 +21,7 @@ jobs:
       - run: |
           dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith.gql
         shell: bash
-      - run: docker logs $(docker ps -af)
+      - run: docker logs $(docker ps -aq)
         if: always()
 #        env:
 #          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
