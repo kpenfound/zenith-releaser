@@ -1,0 +1,11 @@
+query {
+    dagger {
+        engine {
+            fromZenithBranch {
+                cli(workerRegistry: "kylepenfound/dagger-engine-worker-zenith", arch: "arm64", operatingSystem: "darwin") {
+                    export(path: "./dist/dagger-zenith-darwin-arm64")
+                }
+            }
+        }
+    }
+}

@@ -3921,26 +3921,26 @@ func main() {
 
 func invoke(ctx context.Context, parentJSON []byte, parentName string, fnName string, inputArgs map[string][]byte) (any, error) {
 	switch parentName {
-	case "Dagger":
+	case "Cloud":
 		switch fnName {
-		case "Engine":
+		case "About":
 			var err error
-			var parent Dagger
+			var parent Cloud
 			err = json.Unmarshal(parentJSON, &parent)
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(2)
 			}
-			return (*Dagger).Engine(&parent), nil
-		case "Cloud":
+			return (*Cloud).About(&parent), nil
+		case "URL":
 			var err error
-			var parent Dagger
+			var parent Cloud
 			err = json.Unmarshal(parentJSON, &parent)
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(2)
 			}
-			return (*Dagger).Cloud(&parent), nil
+			return (*Cloud).URL(&parent), nil
 		default:
 			return nil, fmt.Errorf("unknown function %s", fnName)
 		}
@@ -4117,26 +4117,26 @@ func invoke(ctx context.Context, parentJSON []byte, parentName string, fnName st
 		default:
 			return nil, fmt.Errorf("unknown function %s", fnName)
 		}
-	case "Cloud":
+	case "Dagger":
 		switch fnName {
-		case "About":
+		case "Engine":
 			var err error
-			var parent Cloud
+			var parent Dagger
 			err = json.Unmarshal(parentJSON, &parent)
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(2)
 			}
-			return (*Cloud).About(&parent), nil
-		case "URL":
+			return (*Dagger).Engine(&parent), nil
+		case "Cloud":
 			var err error
-			var parent Cloud
+			var parent Dagger
 			err = json.Unmarshal(parentJSON, &parent)
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(2)
 			}
-			return (*Cloud).URL(&parent), nil
+			return (*Dagger).Cloud(&parent), nil
 		default:
 			return nil, fmt.Errorf("unknown function %s", fnName)
 		}
@@ -4233,15 +4233,6 @@ func invoke(ctx context.Context, parentJSON []byte, parentName string, fnName st
 	case "":
 		return dag.CurrentModule().
 			WithObject(
-				dag.TypeDef().WithObject("Dagger").
-					WithFunction(
-						dag.NewFunction("Engine",
-							dag.TypeDef().WithObject("Engine")).
-							WithDescription("The Dagger Engine\n")).
-					WithFunction(
-						dag.NewFunction("Cloud",
-							dag.TypeDef().WithObject("Cloud")))).
-			WithObject(
 				dag.TypeDef().WithObject("Worker").
 					WithFunction(
 						dag.NewFunction("Arches",
@@ -4295,16 +4286,17 @@ func invoke(ctx context.Context, parentJSON []byte, parentName string, fnName st
 							dag.TypeDef().WithKind(Voidkind).WithOptional(true)).
 							WithDescription("Run all worker tests\n")).
 					WithField("GoBase", dag.TypeDef().WithObject("Container")).
-					WithField("DaggerCLI", dag.TypeDef().WithObject("File")).
+					WithField("Engine", dag.TypeDef().WithObject("Engine")).
 					WithField("Version", dag.TypeDef().WithKind(Stringkind))).
 			WithObject(
-				dag.TypeDef().WithObject("Cloud").
+				dag.TypeDef().WithObject("Dagger").
 					WithFunction(
-						dag.NewFunction("About",
-							dag.TypeDef().WithKind(Stringkind))).
+						dag.NewFunction("Engine",
+							dag.TypeDef().WithObject("Engine")).
+							WithDescription("The Dagger Engine\n")).
 					WithFunction(
-						dag.NewFunction("URL",
-							dag.TypeDef().WithKind(Stringkind)))).
+						dag.NewFunction("Cloud",
+							dag.TypeDef().WithObject("Cloud")))).
 			WithObject(
 				dag.TypeDef().WithObject("Engine").
 					WithFunction(
@@ -4333,7 +4325,15 @@ func invoke(ctx context.Context, parentJSON []byte, parentName string, fnName st
 						dag.NewFunction("Worker",
 							dag.TypeDef().WithObject("Worker"))).
 					WithField("SourceRepo", dag.TypeDef().WithKind(Stringkind)).
-					WithField("SourceBranch", dag.TypeDef().WithKind(Stringkind))), nil
+					WithField("SourceBranch", dag.TypeDef().WithKind(Stringkind))).
+			WithObject(
+				dag.TypeDef().WithObject("Cloud").
+					WithFunction(
+						dag.NewFunction("About",
+							dag.TypeDef().WithKind(Stringkind))).
+					WithFunction(
+						dag.NewFunction("URL",
+							dag.TypeDef().WithKind(Stringkind)))), nil
 	default:
 		return nil, fmt.Errorf("unknown object %s", parentName)
 	}

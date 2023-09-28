@@ -11,6 +11,7 @@ import (
 const (
 	workerBinName = "dagger-engine"
 	shimBinName   = "dagger-shim"
+	daggerBinName = "dagger"
 	goVersion     = "1.20.6"
 	runcVersion   = "v1.1.5"
 	cniVersion    = "v1.2.0"
@@ -24,9 +25,9 @@ const (
 )
 
 type Worker struct {
-	GoBase    *Container
-	DaggerCLI *File
-	Version   string
+	GoBase  *Container
+	Engine  *Engine
+	Version string
 }
 
 func (w *Worker) Arches() []string {
@@ -72,6 +73,7 @@ func (w *Worker) Container(arch string) *Container {
 		WithFile("/usr/local/bin/buildctl", w.Buildctl(arch)).
 		WithFile("/usr/local/bin/"+shimBinName, w.Shim(arch)).
 		WithFile("/usr/local/bin/"+workerBinName, w.Daemon(arch, w.Version)).
+		WithFile("/usr/local/bin/"+daggerBinName, w.daggerBin(arch)).
 		WithDirectory("/usr/local/bin", w.QemuBins(arch)).
 		WithDirectory("/opt/cni/bin", w.CNIPlugins(arch)).
 		WithDirectory(workerDefaultStateDir, dag.Directory()).
@@ -180,6 +182,10 @@ func (w *Worker) Runc(arch string) *File {
 	))
 }
 
+func (w *Worker) daggerBin(arch string) *File {
+	return w.Engine.CLI(CLIOpts{Arch: arch, OperatingSystem: "linux"})
+}
+
 // Run all worker tests
 func (w *Worker) Tests(ctx context.Context) error {
 	worker := w.Container("")
@@ -202,7 +208,7 @@ func (w *Worker) Tests(ctx context.Context) error {
 
 	testEngineUtils := dag.Host().Directory(tmpDir, HostDirectoryOpts{
 		Include: []string{"engine.tar"},
-	}).WithFile("/dagger", w.DaggerCLI, DirectoryWithFileOpts{
+	}).WithFile("/dagger", w.Engine.CLI(CLIOpts{}), DirectoryWithFileOpts{
 		Permissions: 0755,
 	})
 
@@ -254,7 +260,7 @@ func (w *Worker) Tests(ctx context.Context) error {
 		WithServiceBinding("dagger-engine", worker).
 		WithServiceBinding("registry", registrySvc).
 		WithEnvVariable("CGO_ENABLED", cgoEnabledEnv).
-		WithMountedFile(cliBinPath, w.DaggerCLI).
+		WithMountedFile(cliBinPath, w.Engine.CLI(CLIOpts{})).
 		WithEnvVariable("_EXPERIMENTAL_DAGGER_CLI_BIN", cliBinPath).
 		WithEnvVariable("_EXPERIMENTAL_DAGGER_RUNNER_HOST", endpoint).
 		WithExec(args).
