@@ -87,7 +87,7 @@ func (w *Worker) Container(arch string) *Container {
 }
 
 func (w *Worker) QemuBins(arch string) *Directory {
-	return dag.Container().
+	return dag.Container(ContainerOpts{Platform: Platform("linux/" + arch)}).
 		From(qemuBinImage).
 		Rootfs()
 }
