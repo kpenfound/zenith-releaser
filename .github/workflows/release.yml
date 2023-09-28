@@ -14,22 +14,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - run: echo "${{ secrets.DHTOKEN }}" | docker login -u kylepenfound --password-stdin
-      - run: cd /usr/local/bin && { sudo curl -L https://github.com/jpadams/shykes-dagger-zenith-builder/releases/download/nightly/dagger-zenith-linux-amd64 -o dagger; sudo chmod +x dagger; cd -; }
+      - run: cd /usr/local/bin && { sudo curl -L https://github.com/kpenfound/zenith-releaser/releases/download/nightly/dagger-zenith-linux-amd64 -o dagger; sudo chmod +x dagger; cd -; }
       # Fail if this binary doesn't work
       - run: dagger version
         shell: bash
       - run: |
-          sudo docker run \
-            --name dagger-engine.dev \
-            --privileged \
-            --stop-signal SIGTERM \
-            -d \
-            kylepenfound/dagger-engine-worker-zenith:main
-      - run: |
           dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith.gql
         shell: bash
-        env:
-           _EXPERIMENTAL_DAGGER_RUNNER_HOST: docker-container://dagger-engine.dev
+#        env:
 #          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 #
 #      # Fail if this built binary doesn't work
