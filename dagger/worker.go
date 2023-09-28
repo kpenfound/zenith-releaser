@@ -155,7 +155,7 @@ func (w *Worker) CNIPlugins(arch string) *Directory {
 			"./bridge", "./firewall", // required by dagger network stack
 			"./loopback", "./host-local", // implicitly required (container fails without them)
 		}).
-		WithFile("/opt/cni/bin/dnsname", w.DNSName()).
+		WithFile("/opt/cni/bin/dnsname", w.DNSName(arch)).
 		Directory("/opt/cni/bin")
 }
 
