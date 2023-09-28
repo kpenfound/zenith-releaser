@@ -23,7 +23,8 @@ jobs:
         shell: bash
       - run: docker logs $(docker ps -aq)
         if: always()
-#        env:
+        env:
+           _EXPERIMENTAL_DAGGER_CLI_BIN: "/usr/local/bin/dagger"
 #          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 #
 #      # Fail if this built binary doesn't work
