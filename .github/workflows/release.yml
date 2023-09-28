@@ -21,10 +21,8 @@ jobs:
       - run: |
           docker run \
             --name dagger-engine.dev \
-            --privileged \
             --stop-signal SIGTERM \
             -d \
-            -v dagger-engine:/var/lib/dagger \
             kylepenfound/dagger-engine-worker-zenith:main
       - run: |
           dagger query -m github.com/shykes/daggerverse/dagger --doc ./graphql/publish-zenith-darwin-arm64.gql
