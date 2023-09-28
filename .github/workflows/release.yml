@@ -4,32 +4,25 @@ on:
   #schedule:
   #  - cron: '*/30 * * * *' # every 30 minutes
   workflow_dispatch: # on button click
-
 jobs:
   nightly:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - run: echo "${{ secrets.DHTOKEN }}" | docker login -u kylepenfound --password-stdin
       - run: cd /usr/local/bin && { sudo curl -L https://github.com/kpenfound/zenith-releaser/releases/download/nightly/dagger-zenith-linux-amd64 -o dagger; sudo chmod +x dagger; cd -; }
-      # Fail if this binary doesn't work
       - run: dagger version
         shell: bash
       - run: |
           dagger query -m ./dagger --doc ./graphql/publish-zenith.gql && \
           dagger query -m ./dagger --doc ./graphql/publish-zenith-linux-arm64.gql && \
           dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-amd64.gql && \
-          dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-arm64.gql && \
+          dagger query -m ./dagger --doc ./graphql/publish-zenith-darwin-arm64.gql
         shell: bash
         env:
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
-#
-#      # Fail if this built binary doesn't work
      - run: ./dist/dagger-zenith-linux-amd64 version
        shell: bash
-
      - run: |
          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-arm64 && \
          gh release upload --clobber nightly ./dist/dagger-zenith-linux-amd64 && \
@@ -37,4 +30,5 @@ jobs:
          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-amd64
        env:
          GH_TOKEN: ${{ secrets.GHTOKEN }}
-
+      - name: Stop Engine
+          run: docker stop -t 300 $(docker ps --filter name="dagger-engine-*" -q)
