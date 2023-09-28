@@ -24,7 +24,7 @@ jobs:
          gh release upload --clobber nightly ./dist/dagger-zenith-linux-amd64
          gh release upload --clobber nightly ./dist/dagger-zenith-linux-arm64
          gh release upload --clobber nightly ./dist/dagger-zenith-darwin-amd64
-       env:
-         GH_TOKEN: ${{ secrets.GHTOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GHTOKEN }}
       - name: Stop Engine
         run: docker stop -t 300 $(docker ps --filter name="dagger-engine-*" -q)
