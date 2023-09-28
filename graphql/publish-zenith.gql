@@ -1,0 +1,23 @@
+query {
+    dagger {
+        engine {
+            fromZenithBranch {
+                cli(workerRegistry: "kylepenfound/dagger-engine-worker-zenith:main", arch: "amd64", operatingSystem: "linux") {
+                    export(path: "./dist/dagger-zenith-linux-amd64")
+                }
+                cli(workerRegistry: "kylepenfound/dagger-engine-worker-zenith:main", arch: "arm64", operatingSystem: "linux") {
+                    export(path: "./dist/dagger-zenith-linux-arm64")
+                }
+                cli(workerRegistry: "kylepenfound/dagger-engine-worker-zenith:main", arch: "amd64", operatingSystem: "darwin") {
+                    export(path: "./dist/dagger-zenith-darwin-amd64")
+                }
+                cli(workerRegistry: "kylepenfound/dagger-engine-worker-zenith:main", arch: "arm64", operatingSystem: "darwin") {
+                    export(path: "./dist/dagger-zenith-darwin-arm64")
+                }
+                worker {
+                    publish(ref: "kylepenfound/dagger-engine-worker-zenith:main")
+                }
+            }
+        }
+    }
+}
