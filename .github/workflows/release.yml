@@ -27,4 +27,4 @@ jobs:
        env:
          GH_TOKEN: ${{ secrets.GHTOKEN }}
       - name: Stop Engine
-          run: docker stop -t 300 $(docker ps --filter name="dagger-engine-*" -q)
+        run: docker stop -t 300 $(docker ps --filter name="dagger-engine-*" -q)
